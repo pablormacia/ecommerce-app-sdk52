@@ -1,7 +1,7 @@
 export const colors = {
     azulCobalto:"#0047AB",
     verdeNeon:"#39FF14",
-    morado:"#6A1B9A",
+    morado:"#7b2ca9",
     amarillo:"#FFEB3B",
     naranjaBrillante:"#FF5722",
     negro:"#000000",

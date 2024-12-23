@@ -1,26 +1,16 @@
-import { StyleSheet, Text, View, FlatList, Image,Pressable,useWindowDimensions } from 'react-native'
-import categories from "../../data/categories.json"
+import { StyleSheet, Text, FlatList, Image, Pressable } from 'react-native'
 import FlatCard from '../../components/FlatCard'
-import {useEffect,useState} from 'react'
-import { colors } from '../../theme/colors'
+import { useGetCategoriesQuery } from '../../services/shopService'
 
-const CategoriesScreen = ({navigation}) => {
 
-    const {width,height} = useWindowDimensions()
-    const [isPortrait, setIsPortrait] = useState(true)
+const CategoriesScreen = ({ navigation }) => {
 
-    useEffect(()=>{
-        if(width>height){
-            setIsPortrait(false)
-        }else{
-            setIsPortrait(true)
-        }
-    },
-    [width,height])
+    const { data: categories, error, isLoading } = useGetCategoriesQuery()
+
 
     const renderCategoryItem = ({ item, index }) => {
         return (
-            <Pressable onPress={()=>navigation.navigate('Productos', item.title)}>
+            <Pressable onPress={() => navigation.navigate('Productos', item.title)}>
                 <FlatCard style={
                     index % 2 == 0
                         ?
@@ -33,7 +23,7 @@ const CategoriesScreen = ({navigation}) => {
                         style={styles.image}
                         resizeMode='contain'
                     />
-                    <Text style={width>400?styles.categoryTitle:stylesSmall.categoryTitle}>{item.title}</Text>
+                    <Text style={styles.categoryTitle}>{item.title}</Text>
                 </FlatCard>
             </Pressable>
         )
@@ -63,7 +53,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: "bold",
     },
-    categoryTitleSmall:{
+    categoryTitleSmall: {
         fontSize: 12,
         fontWeight: "bold",
     },
