@@ -5,10 +5,11 @@ import RootStack from './src/navigation/RootStack';
 
 export default function App() {
   return (
-    <Provider store={store}>
+      <Provider store={store}>
         <RootStack />
         <StatusBar style="auto" />
-    </Provider>
+      </Provider>
+    
   );
 }
 

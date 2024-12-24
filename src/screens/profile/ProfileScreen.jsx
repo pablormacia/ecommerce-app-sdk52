@@ -5,8 +5,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import * as ImagePicker from 'expo-image-picker'
 import { setProfilePicture } from '../../features/user/userSlice';
 import { usePutProfilePictureMutation } from '../../services/userService';
+import Icon from "react-native-vector-icons/MaterialIcons"
+import { useSQLiteContext } from 'expo-sqlite';
+import { clearUser } from '../../features/auth/authSlice';
 
 const ProfileScreen = () => {   
+    const db = useSQLiteContext();
     const user = useSelector(state=>state.authReducer.value.email)
     const localId = useSelector(state=>state.authReducer.value.localId)
     const image = useSelector(state=>state.userReducer.value.profilePicture)
@@ -39,6 +43,18 @@ const ProfileScreen = () => {
         }
     }
 
+    const logout = async () => {
+        try{
+            const result =await db.runAsync('DELETE FROM sessions'); 
+            dispatch(clearUser())
+        }catch(error){
+            console.log("Error al eliminar al usuario de la db", error)
+        }
+        
+        
+        
+    }
+
     
     return (
         <View style={styles.profileContainer}>
@@ -55,6 +71,7 @@ const ProfileScreen = () => {
                 </Pressable>
             </View>
             <Text style={styles.profileData}>Email: {user}</Text>
+            <Pressable onPress={logout}><Icon name="logout" size={32} color={colors.grisMedio}/></Pressable>
         </View>
     )
 }
