@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Pressable,Image } from 'react-native'
+import { StyleSheet, Text, View, Pressable, Image } from 'react-native'
 import { colors } from '../../theme/colors';
 import CameraIcon from '../../components/CameraIcon';
 import { useSelector, useDispatch } from 'react-redux'
@@ -9,11 +9,11 @@ import Icon from "react-native-vector-icons/MaterialIcons"
 import { useSQLiteContext } from 'expo-sqlite';
 import { clearUser } from '../../features/auth/authSlice';
 
-const ProfileScreen = () => {   
+const ProfileScreen = () => {
     const db = useSQLiteContext();
-    const user = useSelector(state=>state.authReducer.value.email)
-    const localId = useSelector(state=>state.authReducer.value.localId)
-    const image = useSelector(state=>state.userReducer.value.profilePicture)
+    const user = useSelector(state => state.authReducer.value.email)
+    const localId = useSelector(state => state.authReducer.value.localId)
+    const image = useSelector(state => state.userReducer.value.profilePicture)
 
     //console.log("user:", user,"image:", image,"localId:", localId)
 
@@ -21,41 +21,41 @@ const ProfileScreen = () => {
 
     const [triggerPutProfilePicture, result] = usePutProfilePictureMutation()
 
-    const verifyCameraPermissions = async ()=>{
-        const {granted} = await ImagePicker.requestCameraPermissionsAsync()
-        if(!granted) return false
+    const verifyCameraPermissions = async () => {
+        const { granted } = await ImagePicker.requestCameraPermissionsAsync()
+        if (!granted) return false
         return true
     }
 
-    const pickImage = async ()=>{
+    const pickImage = async () => {
         const isPersmissionOk = await verifyCameraPermissions()
-        if(isPersmissionOk){
+        if (isPersmissionOk) {
             let result = await ImagePicker.launchCameraAsync({
                 allowsEditing: true,
-                aspect: [1,1],
-                base64:true,
+                aspect: [1, 1],
+                base64: true,
                 quality: 0.6
             })
-            if(!result.canceled){
+            if (!result.canceled) {
                 dispatch(setProfilePicture(`data:image/jpeg;base64,${result.assets[0].base64}`))
-                triggerPutProfilePicture({image:`data:image/jpeg;base64,${result.assets[0].base64}`,localId })
+                triggerPutProfilePicture({ image: `data:image/jpeg;base64,${result.assets[0].base64}`, localId })
             }
         }
     }
 
     const logout = async () => {
-        try{
-            const result =await db.runAsync('DELETE FROM sessions'); 
+        try {
+            const result = await db.runAsync('DELETE FROM sessions WHERE localId=$localId', { $localId: localId });
             dispatch(clearUser())
-        }catch(error){
-            console.log("Error al eliminar al usuario de la db", error)
+        } catch (error) {
+            console.log("Error al eliminar al usuario", error)
         }
-        
-        
-        
+
+
+
     }
 
-    
+
     return (
         <View style={styles.profileContainer}>
             <View style={styles.imageProfileContainer}>
@@ -71,7 +71,7 @@ const ProfileScreen = () => {
                 </Pressable>
             </View>
             <Text style={styles.profileData}>Email: {user}</Text>
-            <Pressable onPress={logout}><Icon name="logout" size={32} color={colors.grisMedio}/></Pressable>
+            <Pressable onPress={logout}><Icon name="logout" size={32} color={colors.grisMedio} /></Pressable>
         </View>
     )
 }

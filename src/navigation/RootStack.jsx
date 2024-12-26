@@ -10,17 +10,6 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setProfilePicture } from "../features/user/userSlice";
 
-import { SQLiteProvider,useSQLiteContext } from 'expo-sqlite';
-
-export const initializeDB = async (db) => {
-  try{
-      await db.execAsync('CREATE TABLE IF NOT EXISTS sessions (id INTEGER PRIMARY KEY NOT NULL, email TEXT NOT NULL, localId TEXT NOT NULL);');
-      //await db.execAsync('DROP TABLE sessions;');
-      console.log("Base de datos inicializada")
-  }catch(error){
-      console.log("Error al inizializar la base de datos", error)
-  }
-}
 
 
 const RootStack = () => {
@@ -38,13 +27,12 @@ const RootStack = () => {
     }, [profilePicture])
 
     return (
-        <SQLiteProvider databaseName="ecommerce-app-sdk52.db" onInit={initializeDB} >
+        
             <NavigationContainer>
                 {
                     user ? <TabNavigator /> : <AuthNavigator />
                 }
             </NavigationContainer>
-        </SQLiteProvider >
     )
 }
 
