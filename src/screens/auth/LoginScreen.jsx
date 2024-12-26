@@ -8,8 +8,8 @@ import { useSQLiteContext } from 'expo-sqlite';
 
 const textInputWidth = Dimensions.get('window').width * 0.7
 
-const LoginScreen = ({navigation}) => {
-    const db = useSQLiteContext();
+const LoginScreen = ({ navigation }) => {
+    const db = useSQLiteContext()
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
@@ -19,43 +19,42 @@ const LoginScreen = ({navigation}) => {
 
     useEffect(() => {
         async function setup() {
-          const result = await db.getFirstAsync('SELECT * FROM sessions');
-          console.log("Usuarios en db:", result)
-          if(result.email){
-            console.log(result)
-            dispatch(setUser({email: result.email,localId: result.localId}))
-          }
+            const result = await db.getFirstAsync('SELECT * FROM sessions')
+            console.log("Usuarios en db: ", result)
+            if (result.email) {
+                dispatch(setUser({ email: result.email, localId: result.localId }))
+            }
         }
-        setup();
-      }, []);
+        setup()
+    }, [])
 
-      const saveUserInDb =async (email, localId) =>{
+    const saveUserInDb = async (email, localId)=>{
         try{
-            const result = await db.runAsync('INSERT INTO sessions (email,localId) VALUES (?,?)', email, localId);
-            console.log("Usuario guardado con éxito en la db:", result)
+            const result = await db.runAsync('INSERT INTO sessions (email, localId) VALUES (?,?)',email, localId)
+            console.log("Usuario agregado con éxito a la db", result)
         }catch(error){
-            console.log("Error al guardar el usuario en la db: ", error)
+            console.log("Error al guardar el usuario en la db", error)
         }
     }
 
-    
-      useEffect(()=>{
+
+    useEffect(() => {
         async function saveUser() {
-            if(result.status=="fulfilled"){
+            if (result.status == "fulfilled") {
                 dispatch(setUser(result.data))
                 await saveUserInDb(result.data.email, result.data.localId)
-            }else if(result.status=="rejected"){
+            } else if (result.status == "rejected") {
                 console.log("Se produjo un error al iniciar sesión")
             }
         }
         saveUser()
-    },[result])
-    
+    }, [result])
 
-    
 
-    const onSubmit = async ()=>{
-        triggerLogin({email,password})
+
+
+    const onSubmit = async () => {
+        triggerLogin({ email, password })
     }
 
 

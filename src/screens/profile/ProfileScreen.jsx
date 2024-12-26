@@ -8,12 +8,17 @@ import { usePutProfilePictureMutation } from '../../services/userService';
 import Icon from "react-native-vector-icons/MaterialIcons"
 import { useSQLiteContext } from 'expo-sqlite';
 import { clearUser } from '../../features/auth/authSlice';
+import MapPreview from '../../components/MapPreview';
+import * as Location from 'expo-location';
+import { useState } from 'react';
+
 
 const ProfileScreen = () => {
-    const db = useSQLiteContext();
+    const db = useSQLiteContext()
     const user = useSelector(state => state.authReducer.value.email)
     const localId = useSelector(state => state.authReducer.value.localId)
     const image = useSelector(state => state.userReducer.value.profilePicture)
+    const [location, setLocation] = useState(null);
 
     //console.log("user:", user,"image:", image,"localId:", localId)
 
@@ -43,18 +48,37 @@ const ProfileScreen = () => {
         }
     }
 
-    const logout = async () => {
-        try {
-            const result = await db.runAsync('DELETE FROM sessions WHERE localId=$localId', { $localId: localId });
+    const logout = async ()=>{
+        try{
+            const result = await db.runAsync('DELETE FROM sessions WHERE localId=$localId',{$localId: localId})
             dispatch(clearUser())
-        } catch (error) {
-            console.log("Error al eliminar al usuario", error)
+        }catch(error){
+            console.log("Error al cerrar sesion", error)
         }
-
-
-
     }
 
+    const getLocationPermissions = async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync()
+        if (status !== 'granted') {
+            return false;
+        }
+        return true
+    }
+
+    const getLocation = async () => {
+        const permissionOk = await getLocationPermissions()
+        if (!permissionOk) {
+            console.log("Permisos denegados")
+        } else {
+            let location = await Location.getCurrentPositionAsync({});
+            if (location) {
+                console.log(location.coords)
+                setLocation(location.coords);
+            } else {
+                console.log("Error al obtener la ubicación")
+            }    
+        }
+    }
 
     return (
         <View style={styles.profileContainer}>
@@ -71,7 +95,10 @@ const ProfileScreen = () => {
                 </Pressable>
             </View>
             <Text style={styles.profileData}>Email: {user}</Text>
-            <Pressable onPress={logout}><Icon name="logout" size={32} color={colors.grisMedio} /></Pressable>
+            <Text style={styles.profileData}>Ubicación: </Text>
+            <MapPreview location={location} />
+            <Pressable style={styles.getLocation} onPress={getLocation}><Text style={styles.getLocationText}>Obtener ubicación: </Text><Text><Icon name="my-location" size={32} color={colors.naranjaBrillante} /></Text></Pressable>
+            <Pressable style={styles.logout} onPress={logout}><Text><Icon name="logout" size={32} color={colors.grisOscuro} /></Text></Pressable>
         </View>
     )
 }
@@ -109,5 +136,18 @@ const styles = StyleSheet.create({
         width: 128,
         height: 128,
         borderRadius: 128
+    },
+    logout:{
+        position:'absolute',
+        top:10,
+        right:10
+    },
+    getLocation:{
+        flexDirection:'row',
+        alignItems:'center',
+    },
+    getLocationText:{
+        color:colors.naranjaBrillante,
+        fontSize:16
     }
 })
