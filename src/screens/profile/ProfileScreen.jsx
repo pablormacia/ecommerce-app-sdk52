@@ -9,7 +9,7 @@ import Icon from "react-native-vector-icons/MaterialIcons"
 import { useSQLiteContext } from 'expo-sqlite';
 import { clearUser } from '../../features/auth/authSlice';
 import MapPreview from '../../components/MapPreview';
-import * as Location from 'expo-location';
+import * as Location from 'expo-location'
 import { useState } from 'react';
 
 
@@ -18,9 +18,8 @@ const ProfileScreen = () => {
     const user = useSelector(state => state.authReducer.value.email)
     const localId = useSelector(state => state.authReducer.value.localId)
     const image = useSelector(state => state.userReducer.value.profilePicture)
-    const [location, setLocation] = useState(null);
+    const [location,setLocation] = useState("")
 
-    //console.log("user:", user,"image:", image,"localId:", localId)
 
     const dispatch = useDispatch()
 
@@ -57,26 +56,24 @@ const ProfileScreen = () => {
         }
     }
 
-    const getLocationPermissions = async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync()
-        if (status !== 'granted') {
-            return false;
-        }
+    const verifyLocationPermissions = async ()=>{
+        const {status} = await Location.requestForegroundPermissionsAsync()
+        if(status !== 'granted') return false
         return true
     }
 
-    const getLocation = async () => {
-        const permissionOk = await getLocationPermissions()
-        if (!permissionOk) {
-            console.log("Permisos denegados")
-        } else {
-            let location = await Location.getCurrentPositionAsync({});
-            if (location) {
-                console.log(location.coords)
-                setLocation(location.coords);
-            } else {
+    const getLocation = async () =>{
+        const isPermissionsOk = await verifyLocationPermissions()
+        if(!isPermissionsOk){
+            console.log("Error al obtener los permisos necesarios")
+        }else{
+            let location = await Location.getCurrentPositionAsync()
+            if(location){
+                console.log(location)
+                setLocation(location.coords)
+            }else{
                 console.log("Error al obtener la ubicación")
-            }    
+            }
         }
     }
 
@@ -97,7 +94,7 @@ const ProfileScreen = () => {
             <Text style={styles.profileData}>Email: {user}</Text>
             <Text style={styles.profileData}>Ubicación: </Text>
             <MapPreview location={location} />
-            <Pressable style={styles.getLocation} onPress={getLocation}><Text style={styles.getLocationText}>Obtener ubicación: </Text><Text><Icon name="my-location" size={32} color={colors.naranjaBrillante} /></Text></Pressable>
+            <Pressable style={styles.getLocation} onPress={getLocation}><Text style={styles.getLocationText}>Obtener ubicación: </Text><Text><Icon name="my-location" size={24} color={colors.blanco} /></Text></Pressable>
             <Pressable style={styles.logout} onPress={logout}><Text><Icon name="logout" size={32} color={colors.grisOscuro} /></Text></Pressable>
         </View>
     )
@@ -145,9 +142,15 @@ const styles = StyleSheet.create({
     getLocation:{
         flexDirection:'row',
         alignItems:'center',
+        padding:8,
+        paddingHorizontal:24,
+        backgroundColor: colors.naranjaBrillante,
+        borderRadius:16,
+        margin: 16
     },
     getLocationText:{
-        color:colors.naranjaBrillante,
-        fontSize:16
+        color:colors.blanco,
+        fontSize:16,
+        
     }
 })
